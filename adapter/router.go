@@ -28,6 +28,7 @@ type Router interface {
 	Rule(uuid string) (Rule, bool)
 	AppendTracker(tracker ConnectionTracker)
 	ResetNetwork()
+	Reload()
 }
 
 type ConnectionTracker interface {

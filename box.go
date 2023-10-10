@@ -43,6 +43,7 @@ type Box struct {
 	outbound   *outbound.Manager
 	connection *route.ConnectionManager
 	router     *route.Router
+	reloadChan chan struct{}
 	services   []adapter.LifecycleService
 	done       chan struct{}
 }
@@ -79,6 +80,7 @@ func Context(
 
 func New(options Options) (*Box, error) {
 	createdAt := time.Now()
+	reloadChan := make(chan struct{}, 1)
 	ctx := options.Context
 	if ctx == nil {
 		ctx = context.Background()
@@ -146,7 +148,7 @@ func New(options Options) (*Box, error) {
 	service.MustRegister[adapter.NetworkManager](ctx, networkManager)
 	connectionManager := route.NewConnectionManager(logFactory.NewLogger("connection"))
 	service.MustRegister[adapter.ConnectionManager](ctx, connectionManager)
-	router, err := route.NewRouter(ctx, logFactory, routeOptions, common.PtrValueOrDefault(options.DNS))
+	router, err := route.NewRouter(ctx, logFactory, routeOptions, common.PtrValueOrDefault(options.DNS), reloadChan)
 	if err != nil {
 		return nil, E.Cause(err, "initialize router")
 	}
@@ -295,6 +297,7 @@ func New(options Options) (*Box, error) {
 		outbound:   outboundManager,
 		connection: connectionManager,
 		router:     router,
+		reloadChan: reloadChan,
 		createdAt:  createdAt,
 		logFactory: logFactory,
 		logger:     logFactory.Logger(),
@@ -435,4 +438,8 @@ func (s *Box) Inbound() adapter.InboundManager {
 
 func (s *Box) Outbound() adapter.OutboundManager {
 	return s.outbound
+}
+
+func (s *Box) ReloadChan() <-chan struct{} {
+	return s.reloadChan
 }

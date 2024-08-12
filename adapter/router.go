@@ -21,9 +21,11 @@ type Router interface {
 	ConnectionRouter
 	PreMatch(metadata InboundContext) error
 	ConnectionRouterEx
+	RuleSets() []RuleSet
 	RuleSet(tag string) (RuleSet, bool)
 	NeedWIFIState() bool
 	Rules() []Rule
+	Rule(uuid string) (Rule, bool)
 	AppendTracker(tracker ConnectionTracker)
 	ResetNetwork()
 }
@@ -47,6 +49,10 @@ type ConnectionRouterEx interface {
 
 type RuleSet interface {
 	Name() string
+	Type() string
+	Format() string
+	UpdatedTime() time.Time
+	Update(ctx context.Context) error
 	StartContext(ctx context.Context, startContext *HTTPStartContext) error
 	PostStart() error
 	Metadata() RuleSetMetadata

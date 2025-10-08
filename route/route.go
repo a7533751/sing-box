@@ -376,6 +376,9 @@ func (r *Router) matchRule(
 
 match:
 	for currentRuleIndex, currentRule := range r.rules {
+		if currentRule.Disabled() {
+			continue
+		}
 		metadata.ResetRuleCache()
 		if !currentRule.Match(metadata) {
 			continue
@@ -665,4 +668,9 @@ func (r *Router) actionResolve(ctx context.Context, metadata *adapter.InboundCon
 		}
 	}
 	return nil
+}
+
+func (r *Router) Rule(uuid string) (adapter.Rule, bool) {
+	rule, exists := r.ruleByUUID[uuid]
+	return rule, exists
 }

@@ -37,6 +37,7 @@ type Router interface {
 	LookupDefault(ctx context.Context, domain string) ([]netip.Addr, error)
 	ClearDNSCache()
 	Rules() []Rule
+	Rule(uuid string) (Rule, bool)
 
 	AppendTracker(tracker ConnectionTracker)
 

@@ -43,6 +43,7 @@ type Router struct {
 	connection              adapter.ConnectionManager
 	network                 adapter.NetworkManager
 	rules                   []adapter.Rule
+	ruleByUUID              map[string]adapter.Rule
 	needGeoIPDatabase       bool
 	needGeositeDatabase     bool
 	geoIPOptions            option.GeoIPOptions
@@ -81,6 +82,7 @@ func NewRouter(ctx context.Context, logFactory log.Factory, options option.Route
 		connection:            service.FromContext[adapter.ConnectionManager](ctx),
 		network:               service.FromContext[adapter.NetworkManager](ctx),
 		rules:                 make([]adapter.Rule, 0, len(options.Rules)),
+		ruleByUUID:            make(map[string]adapter.Rule),
 		dnsRules:              make([]adapter.DNSRule, 0, len(dnsOptions.Rules)),
 		ruleSetMap:            make(map[string]adapter.RuleSet),
 		needGeoIPDatabase:     hasRule(options.Rules, isGeoIPRule) || hasDNSRule(dnsOptions.Rules, isGeoIPDNSRule),
@@ -119,6 +121,7 @@ func NewRouter(ctx context.Context, logFactory log.Factory, options option.Route
 			return nil, E.Cause(err, "parse rule[", i, "]")
 		}
 		router.rules = append(router.rules, routeRule)
+		router.ruleByUUID[routeRule.UUID()] = routeRule
 	}
 	for i, dnsRuleOptions := range dnsOptions.Rules {
 		dnsRule, err := R.NewDNSRule(ctx, router.logger, dnsRuleOptions, true)

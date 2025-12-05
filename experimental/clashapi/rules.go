@@ -49,6 +49,7 @@ func getRules(router adapter.Router) func(w http.ResponseWriter, r *http.Request
 	})
 }
 
+
 func parseRuleUUID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uuid := getEscapeParam(r, "uuid")
@@ -77,5 +78,4 @@ func changeRuleStatus(w http.ResponseWriter, r *http.Request) {
 	rule := r.Context().Value(CtxKeyRule).(adapter.Rule)
 	rule.ChangeStatus()
 	render.NoContent(w, r)
-}
 }

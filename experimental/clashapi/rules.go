@@ -44,9 +44,10 @@ func getRules(router adapter.Router) func(w http.ResponseWriter, r *http.Request
 			UUID:     rule.UUID(),
 		})
 	}
-	render.JSON(w, r, render.M{
-		"rules": rules,
-	})
+ 		render.JSON(w, r, render.M{
+			"rules": rules,
+		})
+	}
 }
 
 

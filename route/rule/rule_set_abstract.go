@@ -140,9 +140,9 @@ func (s *abstractRuleSet) reloadRules(headlessRules []option.HeadlessRule, ruleS
 		ruleCount += rule.RuleCount()
 	}
 	var metadata adapter.RuleSetMetadata
-	metadata.ContainsProcessRule = HasHeadlessRule(headlessRules, isProcessHeadlessRule)
-	metadata.ContainsWIFIRule = HasHeadlessRule(headlessRules, isWIFIHeadlessRule)
-	metadata.ContainsIPCIDRRule = HasHeadlessRule(headlessRules, isIPCIDRHeadlessRule)
+	metadata.ContainsProcessRule = hasHeadlessRule(headlessRules, isProcessHeadlessRule)
+	metadata.ContainsWIFIRule = hasHeadlessRule(headlessRules, isWIFIHeadlessRule)
+	metadata.ContainsIPCIDRRule = hasHeadlessRule(headlessRules, isIPCIDRHeadlessRule)
 	s.access.Lock()
 	s.rules = rules
 	s.ruleCount = ruleCount

@@ -98,10 +98,11 @@ jobs:
           CGO_ENABLED: "0"
           GOPROXY: https://goproxy.cn,direct
           GOSUMDB: sum.golang.org
-          GOCACHE: ~/.cache/go-build
-          GOMODCACHE: ~/go/pkg/mod
+          GOCACHE: ${{ runner.temp }}/go-build
+          GOMODCACHE: ${{ runner.temp }}/go-mod
         run: |
           set -euxo pipefail
+          mkdir -p "$GOCACHE" "$GOMODCACHE"
           go version
           VERSION=$(CGO_ENABLED=0 go run ./cmd/internal/read_tag)
           mkdir -p dist

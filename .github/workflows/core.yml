@@ -96,13 +96,22 @@ jobs:
           GOOS: windows
           GOARCH: ${{ matrix.arch }}
           CGO_ENABLED: "0"
+          GOPROXY: https://goproxy.cn,direct
+          GOSUMDB: sum.golang.org
+          GOCACHE: ~/.cache/go-build
+          GOMODCACHE: ~/go/pkg/mod
         run: |
+          set -euxo pipefail
+          go version
           VERSION=$(CGO_ENABLED=0 go run ./cmd/internal/read_tag)
           mkdir -p dist
-          go build -v -trimpath -o dist/sing-box-windows7-${{ matrix.arch }}.exe \
-          -tags "${TAGS}" \
-          -ldflags "-X github.com/sagernet/sing-box/constant.Version=${VERSION} -s -w -buildid=" \
-          ./cmd/sing-box
+          build_cmd() {
+            go build -v -trimpath -o dist/sing-box-windows7-${{ matrix.arch }}.exe \
+              -tags "${TAGS}" \
+              -ldflags "-X github.com/sagernet/sing-box/constant.Version=${VERSION} -s -w -buildid=" \
+              ./cmd/sing-box
+          }
+          build_cmd || (go clean -cache -modcache && sleep 3 && build_cmd)
 
       - name: Upload Windows 7
         uses: actions/upload-artifact@v4.3.1

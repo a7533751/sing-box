@@ -17,8 +17,11 @@ CURL_ARGS=(
   --show-error
   --retry 5
   --retry-delay 2
-  --retry-all-errors
 )
+
+if curl --help all 2>/dev/null | grep -q -- '--retry-all-errors'; then
+  CURL_ARGS+=(--retry-all-errors)
+fi
 
 if [[ -n "${GITHUB_TOKEN:-}" ]]; then
   CURL_ARGS+=(-H "Authorization: Bearer ${GITHUB_TOKEN}")

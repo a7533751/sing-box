@@ -36,12 +36,12 @@ func (t TrackerMetadata) MarshalJSON() ([]byte, error) {
 		inbound = t.Metadata.InboundType
 	}
 	var domain string
-	if t.Metadata.SniffHost != "" {
-		domain = t.Metadata.SniffHost
+	if t.Metadata.Domain != "" {
+		domain = t.Metadata.Domain
 	} else if t.Metadata.Destination.Fqdn != "" {
 		domain = t.Metadata.Destination.Fqdn
 	} else {
-		domain = t.Metadata.Domain
+		domain = t.Metadata.Destination.AddrString()
 	}
 	var processPath string
 	if t.Metadata.ProcessInfo != nil {

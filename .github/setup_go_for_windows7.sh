@@ -15,6 +15,9 @@ CURL_ARGS=(
   -fL
   --silent
   --show-error
+  --retry 5
+  --retry-delay 2
+  --retry-all-errors
 )
 
 if [[ -n "${GITHUB_TOKEN:-}" ]]; then
@@ -23,7 +26,7 @@ fi
 
 mkdir -p "$HOME/go"
 cd "$HOME/go"
-wget "https://dl.google.com/go/go${VERSION}.linux-amd64.tar.gz"
+curl "${CURL_ARGS[@]}" -o "go${VERSION}.linux-amd64.tar.gz" "https://dl.google.com/go/go${VERSION}.linux-amd64.tar.gz"
 tar -xzf "go${VERSION}.linux-amd64.tar.gz"
 mv go go_win7
 cd go_win7
@@ -42,5 +45,15 @@ cd go_win7
 # 34b899c2fb39b092db4fa67c4417e41dc046be4b: "Revert \"os: remove 5ms sleep on Windows in (*Process).Wait\""
 
 for patch_commit in "${PATCH_COMMITS[@]}"; do
-  curl "${CURL_ARGS[@]}" "https://github.com/MetaCubeX/go/commit/${patch_commit}.diff" | patch --verbose -p 1
+  patch_file="$(mktemp)"
+  if ! curl "${CURL_ARGS[@]}" \
+      -H "Accept: application/vnd.github.v3.diff" \
+      "https://api.github.com/repos/MetaCubeX/go/commits/${patch_commit}" \
+      -o "${patch_file}"; then
+    curl "${CURL_ARGS[@]}" \
+      "https://github.com/MetaCubeX/go/commit/${patch_commit}.diff" \
+      -o "${patch_file}"
+  fi
+  patch --verbose -p 1 < "${patch_file}"
+  rm -f "${patch_file}"
 done

@@ -38,7 +38,7 @@ jobs:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
           CC=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android35-clang
-          VERSION=$(CGO_ENABLED=0 go run ./cmd/internal/read_tag)
+          VERSION=$(CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go run ./cmd/internal/read_tag)
           CGO_ENABLED=0 GOARCH=amd64 GOOS=windows GOAMD64=v3 \
             go build -v -trimpath \
             -ldflags "-X github.com/sagernet/sing-box/constant.Version=${VERSION} -H windowsgui -s -w -buildid=" \
@@ -104,7 +104,7 @@ jobs:
           set -euxo pipefail
           mkdir -p "$GOCACHE" "$GOMODCACHE"
           go version
-          VERSION=$(CGO_ENABLED=0 go run ./cmd/internal/read_tag)
+          VERSION=$(CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go run ./cmd/internal/read_tag)
           mkdir -p dist
           build_cmd() {
             go build -v -trimpath -o dist/sing-box-windows7-${{ matrix.arch }}.exe \

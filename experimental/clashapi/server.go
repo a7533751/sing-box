@@ -119,20 +119,17 @@ func NewServer(ctx context.Context, logFactory log.ObservableFactory, options op
 		r.Get("/logs", getLogs(s.ctx, logFactory))
 		r.Get("/traffic", traffic(s.ctx, trafficManager))
 		r.Get("/version", version)
-			r.Mount("/configs", configRouter(s, logFactory))
-			r.Mount("/proxies", proxyRouter(s, s.router))
-			r.Mount("/rules", ruleRouter(s.router))
-			r.Mount("/connections", connectionRouter(s.ctx, s.router, trafficManager))
-			r.Mount("/providers/proxies", proxyProviderRouter(s))
-			r.Mount("/providers/rules", ruleProviderRouter(s.router))
+		r.Mount("/configs", configRouter(s, logFactory))
+		r.Mount("/proxies", proxyRouter(s, s.router))
+		r.Mount("/rules", ruleRouter(s.router))
+		r.Mount("/connections", connectionRouter(s.ctx, s.router, trafficManager))
+		r.Mount("/providers/proxies", proxyProviderRouter(s))
+		r.Mount("/providers/rules", ruleProviderRouter(s.router))
 		r.Mount("/script", scriptRouter())
 		r.Mount("/profile", profileRouter())
 		r.Mount("/cache", cacheRouter(ctx))
 		r.Mount("/dns", dnsRouter(s.dnsRouter))
-
-		if service.FromContext[adapter.PlatformInterface](ctx) == nil {
-			r.Mount("/restart", restartRouter(ctx, logFactory))
-		}
+		r.Mount("/restart", restartRouter(ctx, logFactory))
 
 		s.setupMetaAPI(r)
 	})

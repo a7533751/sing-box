@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
+	C "github.com/sagernet/sing-box/constant"
 	tf "github.com/sagernet/sing-box/common/tlsfragment"
 	"github.com/sagernet/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
@@ -279,24 +280,6 @@ func verifyPublicKeySHA256(knownHashValues [][]byte, rawCerts [][]byte, timeFunc
 		return E.Cause(err, "failed to parse leaf certificate")
 	}
 
-	pubKeyBytes, err := x509.MarshalPKIXPublicKey(leafCertificate.PublicKey)
-	if err != nil {
-		return E.Cause(err, "failed to marshal public key")
-	}
-	hashValue := sha256.Sum256(pubKeyBytes)
-	for _, value := range knownHashValues {
-		if bytes.Equal(value, hashValue[:]) {
-			return nil
-		}
-	}
-	return E.New("unrecognized remote public key: ", base64.StdEncoding.EncodeToString(hashValue[:]))
-}
-
-func verifyPublicKeySHA256(knownHashValues [][]byte, rawCerts [][]byte, _ func() time.Time) error {
-	leafCertificate, err := x509.ParseCertificate(rawCerts[0])
-	if err != nil {
-		return E.Cause(err, "failed to parse leaf certificate")
-	}
 	pubKeyBytes, err := x509.MarshalPKIXPublicKey(leafCertificate.PublicKey)
 	if err != nil {
 		return E.Cause(err, "failed to marshal public key")
